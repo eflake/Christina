@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.eflake.christina"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="16" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Holo.Light" >
+        <activity
+            android:name="com.eflake.christina.FirstActivity"
+            android:label="@string/app_name"
+            android:uiOptions="splitActionBarWhenNarrow">           
+        </activity>
+        <activity android:name=".SplashActivity"
+            	android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+             <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+       <provider android:name="EflakeProvider" android:authorities="com.eflake.provider.items"></provider>
+       <activity android:name="CreateDiaryActivity" android:theme="@android:style/Theme.Holo.Light"></activity>
+       <activity android:name="DetailDiaryActivity" android:theme="@android:style/Theme.Holo.Light"></activity>
+    </application>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+</manifest>

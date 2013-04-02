@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">老婆账</string>
+    <string name="menu_settings">设置</string>
+    <string name="title_section3">Section 3</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section1">Section 1</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="menu_save">保存</string>
+    <string-array name="drop_list">
+          <item>心情日记</item>
+        <item>老公闹钟</item>
+        <item>老婆记账</item>
+    </string-array>
+</resources>
