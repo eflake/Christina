@@ -54,10 +54,7 @@ public class DetailDiaryActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_settings:
-			// Toast.makeText(this, "hello", Toast.LENGTH_SHORT).show();
-			// Intent intent = new Intent(FirstActivity.this,
-			// CreateDiaryActivity.class);
-			// startActivity(intent);
+			
 			break;
 		case android.R.id.home:
 			setResult(123);

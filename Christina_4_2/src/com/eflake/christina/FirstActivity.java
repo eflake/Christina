@@ -1,7 +1,16 @@
 package com.eflake.christina;
 
+import java.text.SimpleDateFormat;
 import com.eflake.christina.FragmentOne.CallbackDelegate;
 import com.eflake.provider.Model;
+import com.weibo.sdk.android.Oauth2AccessToken;
+import com.weibo.sdk.android.Weibo;
+import com.weibo.sdk.android.WeiboAuthListener;
+import com.weibo.sdk.android.WeiboDialogError;
+import com.weibo.sdk.android.WeiboException;
+import com.weibo.sdk.android.keep.AccessTokenKeeper;
+import com.weibo.sdk.android.sso.SsoHandler;
+import com.weibo.sdk.android.util.Utility;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.AlertDialog;
@@ -19,19 +28,39 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
+import android.widget.Toast;
 
 public class FirstActivity extends FragmentActivity implements
 		CallbackDelegate, OnNavigationListener {
+	  private Weibo mWeibo;
+	    private static final String CONSUMER_KEY = "84951399";// �挎�涓哄������ppkey锛��濡�1646212860";
+	    private static final String REDIRECT_URL = "http://www.sina.com";
+	    public static Oauth2AccessToken accessToken;
+	    public static final String TAG = "sinasdk";
+	    SsoHandler mSsoHandler;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		mWeibo = Weibo.getInstance(CONSUMER_KEY, REDIRECT_URL);
 		initActionBar();
 		initFragment();
+		  FirstActivity.accessToken = AccessTokenKeeper.readAccessToken(this);
+	        if (FirstActivity.accessToken.isSessionValid()) {
+	            Weibo.isWifi = Utility.isWifi(this);
+	            try {
+	                Class sso = Class.forName("com.weibo.sdk.android.api.WeiboAPI");// 濡�����weiboapi���锛��绀�pi���婕�ず�ュ����
+	            } catch (ClassNotFoundException e) {
+	                // e.printStackTrace();
+	                Log.i(TAG, "com.weibo.sdk.android.api.WeiboAPI not found");
+
+	            }
+	        }
 	}
 
-	// ��ʼ��ActionBar
+	
+	// 锟斤拷始锟斤拷ActionBar
 	private void initActionBar() {
 		final ActionBar actionBar = getActionBar();
 		Drawable drawable = getResources().getDrawable(R.drawable.background);
@@ -42,7 +71,7 @@ public class FirstActivity extends FragmentActivity implements
 		SpinnerAdapter adapter = ArrayAdapter.createFromResource(this,
 				R.array.drop_list,
 				R.layout.sp_layout);
-		// �õ���SpinnerAdapter��һ�µ��ַ�����
+		// 锟矫碉拷锟斤拷SpinnerAdapter锟斤拷一锟铰碉拷锟街凤拷锟斤拷锟斤拷
 		//String[] listNames = getResources().getStringArray(R.array.drop_list);
 		actionBar.setListNavigationCallbacks(adapter,
 				new OnNavigationListener() {
@@ -64,7 +93,7 @@ public class FirstActivity extends FragmentActivity implements
 		transaction.commit();
 	}
 
-	// ��ʼ��Fragment
+	// 锟斤拷始锟斤拷Fragment
 	private void initFragment() {
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.add(R.id.container, FragmentFactory.product(0));
@@ -90,6 +119,8 @@ public class FirstActivity extends FragmentActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_settings:
+            mWeibo.authorize(FirstActivity.this, new AuthDialogListener());
+
 			break;
 		case R.id.menu_add:
 			Intent intent = new Intent(FirstActivity.this,
@@ -110,14 +141,14 @@ public class FirstActivity extends FragmentActivity implements
 	}
 
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		// ����Ƿ��ؼ�,ֱ�ӷ��ص�����
+		// 锟斤拷锟斤拷欠锟斤拷丶锟�直锟接凤拷锟截碉拷锟斤拷锟斤拷
 		if (keyCode == KeyEvent.KEYCODE_BACK
 				|| keyCode == KeyEvent.KEYCODE_HOME) {
 			new AlertDialog.Builder(FirstActivity.this)
 					.setIcon(R.drawable.mayuri)
-					.setTitle("��ʱ�뿪��")
-					.setMessage("ȷ���������ˣ��ٿ���һ�£�")
-					.setPositiveButton("������",
+					.setTitle("锟斤拷时锟诫开锟斤拷")
+					.setMessage("确锟斤拷锟斤拷锟斤拷锟斤拷锟剿ｏ拷锟劫匡拷锟斤拷一锟铰ｏ拷")
+					.setPositiveButton("锟斤拷锟斤拷锟斤拷",
 							new DialogInterface.OnClickListener() {
 
 								@Override
@@ -128,7 +159,7 @@ public class FirstActivity extends FragmentActivity implements
 													.myPid());
 								}
 							})
-					.setNegativeButton("������",
+					.setNegativeButton("锟斤拷锟斤拷锟斤拷",
 							new DialogInterface.OnClickListener() {
 
 								@Override
@@ -156,4 +187,64 @@ public class FirstActivity extends FragmentActivity implements
 		return false;
 	}
 
+	 class AuthDialogListener implements WeiboAuthListener {
+
+	        @Override
+	        public void onComplete(Bundle values) {
+	            String token = values.getString("access_token");
+	            String expires_in = values.getString("expires_in");
+	            FirstActivity.accessToken = new Oauth2AccessToken(token, expires_in);
+	            if (FirstActivity.accessToken.isSessionValid()) {
+	                String date = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+	                        .format(new java.util.Date(FirstActivity.accessToken
+	                                .getExpiresTime()));
+//	                mText.setText("璁よ����: \r\n access_token: " + token + "\r\n"
+//	                        + "expires_in: " + expires_in + "\r\n������" + date);
+	                try {
+	                    Class sso = Class
+	                            .forName("com.weibo.sdk.android.api.WeiboAPI");// 濡�����weiboapi���锛��绀�pi���婕�ず�ュ����
+	                } catch (ClassNotFoundException e) {
+	                    // e.printStackTrace();
+	                    Log.i(TAG, "com.weibo.sdk.android.api.WeiboAPI not found");
+
+	                }
+//	                cancelBtn.setVisibility(View.VISIBLE);
+	                AccessTokenKeeper.keepAccessToken(FirstActivity.this,
+	                        accessToken);
+	                Toast.makeText(FirstActivity.this, "success", Toast.LENGTH_SHORT)
+	                        .show();
+	            }
+	        }
+
+	        @Override
+	        public void onError(WeiboDialogError e) {
+	            Toast.makeText(getApplicationContext(),
+	                    "Auth error : " + e.getMessage(), Toast.LENGTH_LONG).show();
+	        }
+
+	        @Override
+	        public void onCancel() {
+	            Toast.makeText(getApplicationContext(), "Auth cancel",
+	                    Toast.LENGTH_LONG).show();
+	        }
+
+	        @Override
+	        public void onWeiboException(WeiboException e) {
+	            Toast.makeText(getApplicationContext(),
+	                    "Auth exception : " + e.getMessage(), Toast.LENGTH_LONG)
+	                    .show();
+	        }
+
+	    }
+	 @Override
+	    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	        super.onActivityResult(requestCode, resultCode, data);
+
+	        /**
+	         * 涓��涓や釜娉ㄩ����浠ｇ�锛��褰�dk���sso�舵����
+	         */
+	        if (mSsoHandler != null) {
+	            mSsoHandler.authorizeCallBack(requestCode, resultCode, data);
+	        }
+	    }
 }
